@@ -51,8 +51,7 @@ SpotifyFrame::SpotifyFrame()
 }
 
 void SpotifyFrame::activate() {
-    show();
-    raise();
+    showNormal();
     activateWindow();
 }
 
@@ -60,7 +59,11 @@ void SpotifyFrame::iconActivated(QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
         case QSystemTrayIcon::Trigger:
         case QSystemTrayIcon::DoubleClick:
-            if (isVisible())
+            if (isMinimized())
+                activate();
+            else if (isVisible() && !isActiveWindow())
+                activateWindow();
+            else if (isVisible())
                 hide();
             else
                 activate();
