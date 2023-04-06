@@ -100,6 +100,7 @@ void SpotifyTrayApp::stopSpotify() {
         spotifyProcess.terminate();
     else
         kill(spotify.pid, SIGTERM);
+    QProcess::execute("flatpak", { "kill", "com.spotify.Client" });
     usleep(2e5);  // 0.2 sec
 }
 
