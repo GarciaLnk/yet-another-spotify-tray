@@ -62,12 +62,26 @@ SpotifyTrayApp::~SpotifyTrayApp() {
 // spawn a new process using the args if the window is not found
 // at the first attempt.
 WindowData SpotifyTrayApp::startSpotify(const QStringList& args) {
-    spotifyProcess.start(DEFAULT_CLIENT_APP_PATH, args, QIODevice::ReadOnly);
+    if (args.contains("--flatpak")) {
+        QStringList flatpakArgs = { "run", "com.spotify.Client" };
+        flatpakArgs.append(args);
+        flatpakArgs.removeOne("--flatpak");
+        spotifyProcess.start("flatpak", flatpakArgs, QIODevice::ReadOnly);
+    } else {
+        spotifyProcess.start(DEFAULT_CLIENT_APP_PATH, args,
+            QIODevice::ReadOnly);
+    }
 
     // App launched, it double forks; need to find the window and PID
     for (int i = 0; i < CLIENT_FIND_ATTEMPTS; i++) {
         // Spotify takes time to start up, so wait a while.
-        usleep(5e5);  // 0.5 sec
+        // The Flatpak takes longer to start up.
+        if (args.contains("--flatpak")) {
+            usleep(3e6); // 3 sec
+        } else {
+            usleep(5e5); // 0.5 sec
+        }
+
         if (WindowData found = getSpotifyWindow()) {
             return found;
         } else {
