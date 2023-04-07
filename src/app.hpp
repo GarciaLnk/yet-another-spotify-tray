@@ -7,6 +7,8 @@
 #include "window.hpp"
 
 #define DEFAULT_CLIENT_APP_PATH "spotify"
+#define DEFAULT_CLIENT_LD_PRELOAD "LD_PRELOAD=/usr/local/lib/spotify-adblock.so"
+#define DEFAULT_FLATPAK_LD_PRELOAD "--env=\"LD_PRELOAD=$HOME/.spotify-adblock/spotify-adblock.so:\""
 #define CLIENT_FIND_ATTEMPTS 5
 
 class SpotifyTrayApp : public QApplication {
@@ -14,6 +16,8 @@ class SpotifyTrayApp : public QApplication {
 
     // Spotify process handle
     QProcess spotifyProcess;
+
+    QProcessEnvironment spotifyEnv;
 
     // Spotify window data
     WindowData spotify;

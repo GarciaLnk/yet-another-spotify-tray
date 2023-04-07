@@ -63,11 +63,14 @@ SpotifyTrayApp::~SpotifyTrayApp() {
 // at the first attempt.
 WindowData SpotifyTrayApp::startSpotify(const QStringList& args) {
     if (args.contains("--flatpak")) {
-        QStringList flatpakArgs = { "run", "com.spotify.Client" };
+        QStringList flatpakArgs = { "run", "com.spotify.Client", DEFAULT_FLATPAK_LD_PRELOAD };
         flatpakArgs.append(args);
         flatpakArgs.removeOne("--flatpak");
         spotifyProcess.start("flatpak", flatpakArgs, QIODevice::ReadOnly);
     } else {
+        spotifyEnv = QProcessEnvironment::systemEnvironment();
+        spotifyEnv.insert("LD_PRELOAD", DEFAULT_CLIENT_LD_PRELOAD);
+        spotifyProcess.setProcessEnvironment(spotifyEnv);
         spotifyProcess.start(DEFAULT_CLIENT_APP_PATH, args,
             QIODevice::ReadOnly);
     }
